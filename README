@@ -145,10 +145,25 @@ kubectl port-forward \
   svc/frontend 8080:80 \
   -n monitoring
 
+ 
+
+# Update the existing nodegroup:
+  eksctl upgrade nodegroup \
+  --config-file eks-ctl.yaml \
+  --approve
+
 
 # Increase worker nodes to 3
 eksctl scale nodegroup \
   --cluster monitoring-dev \
   --name monitoring-nodes \
   --nodes 3 \
-  --region ap-southeast-2  
+  --region ap-southeast-2   
+
+#   if any error above , use below 
+
+aws eks update-nodegroup-config \
+  --cluster-name monitoring-dev \
+  --nodegroup-name monitoring-nodes \
+  --scaling-config minSize=2,maxSize=3,desiredSize=3 \
+  --region ap-southeast-2
