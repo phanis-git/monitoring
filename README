@@ -69,3 +69,6 @@ sudo install -m 0755 /tmp/eksctl /usr/local/bin && rm /tmp/eksctl
 
 # do 
 aws configure 
+
+
+# eks addons -  vpc-cni kube-proxy coredns

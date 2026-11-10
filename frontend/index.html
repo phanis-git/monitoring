@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKS Monitoring Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>EKS Monitoring Demo</h1>
+    <p>Frontend + Backend Kubernetes Application</p>
+</header>
+
+<main>
+    <section class="cards">
+        <div class="card">
+            <h3>Backend Status</h3>
+            <p id="health" class="status">Checking...</p>
+        </div>
+
+        <div class="card">
+            <h3>Total API Requests</h3>
+            <p id="requests">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Backend Uptime</h3>
+            <p id="uptime">0 seconds</p>
+        </div>
+
+        <div class="card">
+            <h3>Backend Pod</h3>
+            <p id="hostname">-</p>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>API Testing</h2>
+
+        <button onclick="checkHealth()">Health API</button>
+        <button onclick="getItems()">GET Items</button>
+        <button onclick="getStats()">GET Stats</button>
+
+        <div class="add-item">
+            <input type="text" id="itemName"
+                   placeholder="Enter item name">
+            <button onclick="createItem()">POST Item</button>
+        </div>
+
+        <pre id="output">API responses will appear here...</pre>
+    </section>
+
+    <section class="panel">
+        <h2>Application Information</h2>
+        <p>Platform: Amazon EKS</p>
+        <p>Frontend: HTML, CSS, JavaScript and Nginx</p>
+        <p>Backend: Python FastAPI</p>
+        <p>Monitoring: Prometheus and Grafana (upcoming)</p>
+    </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
