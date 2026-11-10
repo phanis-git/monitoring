@@ -143,4 +143,4 @@ kubectl apply -f k8s/frontend-service.yaml
 # Because we are using ClusterIP, access it through port-forwarding.
 kubectl port-forward \
   svc/frontend 8080:80 \
-  -n sample-app
+  -n monitoring
