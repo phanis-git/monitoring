@@ -72,3 +72,62 @@ aws configure
 
 
 # eks addons -  vpc-cni kube-proxy coredns
+
+
+# Create ECR repository for frontend and backend
+
+aws sts get-caller-identity
+
+aws ecr create-repository \
+  --repository-name monitoring-frontend \
+  --region us-east-1
+
+aws ecr create-repository \
+  --repository-name monitoring-backend \
+  --region us-east-1
+
+
+# go to backend 
+docker build -t monitoring-backend:v1 . 
+or
+cd backend
+
+docker build --platform linux/amd64 \
+  -t monitoring-backend:v1 .
+
+docker tag monitoring-backend:v1 \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/monitoring-backend:v1
+
+docker push \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/monitoring-backend:v1
+
+
+# for frontend
+
+cd ../frontend
+
+docker build --platform linux/amd64 \
+  -t monitoring-frontend:v1 .
+
+docker tag monitoring-frontend:v1 \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/monitoring-frontend:v1
+
+docker push \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/monitoring-frontend:v1
+
+# Login to ecr and push the images to ecr
+aws ecr get-login-password --region $AWS_REGION | \
+docker login \
+  --username AWS \
+  --password-stdin \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+
+# Verify ECR images
+aws ecr list-images \
+  --repository-name monitoring-frontend \
+  --region us-east-1
+
+aws ecr list-images \
+  --repository-name monitoring-backend \
+  --region us-east-1
