@@ -144,3 +144,11 @@ kubectl apply -f k8s/frontend-service.yaml
 kubectl port-forward \
   svc/frontend 8080:80 \
   -n monitoring
+
+
+# Increase worker nodes to 3
+eksctl scale nodegroup \
+  --cluster monitoring-dev \
+  --name monitoring-nodes \
+  --nodes 3 \
+  --region ap-southeast-2  
