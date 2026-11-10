@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: monitoring
 spec:
-  replicas: 2
+  replicas: 1
 
   selector:
     matchLabels:
@@ -25,18 +25,18 @@ spec:
 
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 500m
+              memory: 512Mi
 
             limits:
-              cpu: 500m
+              cpu: 700m
               memory: 512Mi
 
           readinessProbe:
             httpGet:
               path: /api/health
               port: 8000
-            initialDelaySeconds: 5
+            initialDelaySeconds: 9
             periodSeconds: 10
 
           livenessProbe:

@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: monitoring
 spec:
-  replicas: 2
+  replicas: 1
 
   selector:
     matchLabels:
@@ -25,18 +25,18 @@ spec:
 
           resources:
             requests:
-              cpu: 50m
-              memory: 64Mi
-
-            limits:
               cpu: 250m
               memory: 128Mi
+
+            limits:
+              cpu: 500m
+              memory: 256Mi
 
           readinessProbe:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 10
 
           livenessProbe:
