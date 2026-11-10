@@ -1,0 +1,71 @@
+lsblk
+lsblk -f
+df -h
+
+"""For Ubunttu Linux """
+
+sudo mkfs.ext4 /dev/nvme1n1
+sudo mkdir -p /data
+sudo mount /dev/nvme1n1 /data
+sudo mkdir -p /data/docker
+sudo systemctl stop docker
+sudo nano /etc/docker/daemon.json
+
+
+# Add json
+{
+  "data-root": "/data/docker"
+}
+
+# if we get cannot open the file use below
+
+sudo mkdir -p /etc/docker
+sudo nano /etc/docker/daemon.json
+
+{
+  "data-root": "/data/docker"
+}
+
+and Save: Ctrl + O → Enter → Ctrl + X
+
+sudo systemctl restart docker
+docker info | grep "Docker Root Dir"
+
+# Install docker
+sudo apt-get remove -y docker.io docker-doc docker-compose podman-docker containerd runc
+
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+
+
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl enable docker
+sudo systemctl start docker
+
+sudo usermod -aG docker ubuntu
+
+# Later install kubectl and eksctl 
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.34.2/2025-11-13/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mkdir -p $HOME/bin && cp ./kubectl  /usr/local/bin && export PATH=$HOME/bin:$PATH
+
+ARCH=amd64
+PLATFORM=$(uname -s)_$ARCH
+curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+sudo install -m 0755 /tmp/eksctl /usr/local/bin && rm /tmp/eksctl
+
+# do 
+aws configure 
