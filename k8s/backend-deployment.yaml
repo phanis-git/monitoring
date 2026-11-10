@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: sample-app
+  namespace: monitoring
 spec:
   replicas: 2
 

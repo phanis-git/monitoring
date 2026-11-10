@@ -2,5 +2,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: monitoring
+  labels:
+    environment: dev
+    project: eks-monitoring 
 
   # 269469929419
