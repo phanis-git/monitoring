@@ -2,7 +2,7 @@ lsblk
 lsblk -f
 df -h
 
-"""For Ubunttu Linux """
+"""For Ubuntu Linux """
 
 sudo mkfs.ext4 /dev/nvme1n1
 sudo mkdir -p /data
@@ -80,11 +80,11 @@ aws sts get-caller-identity
 
 aws ecr create-repository \
   --repository-name monitoring-frontend \
-  --region us-east-1
+  --region ap-southeast-2
 
 aws ecr create-repository \
   --repository-name monitoring-backend \
-  --region us-east-1
+  --region ap-southeast-2
 
 
 # go to backend 
@@ -126,11 +126,11 @@ docker login \
 # Verify ECR images
 aws ecr list-images \
   --repository-name monitoring-frontend \
-  --region us-east-1
+  --region ap-southeast-2
 
 aws ecr list-images \
   --repository-name monitoring-backend \
-  --region us-east-1
+  --region ap-southeast-2
 
 
 kubectl apply -f k8s/namespace.yaml
@@ -143,7 +143,7 @@ kubectl apply -f k8s/frontend-service.yaml
 # Because we are using ClusterIP, access it through port-forwarding.
 kubectl port-forward \
   svc/frontend 8080:80 \
-  -n monitoring
+  -n my-app
 
  
 
@@ -167,3 +167,130 @@ aws eks update-nodegroup-config \
   --nodegroup-name monitoring-nodes \
   --scaling-config minSize=2,maxSize=3,desiredSize=3 \
   --region ap-southeast-2
+
+
+  # Get LoadBalancer IP
+  kubectl get svc frontend -n my-app -w
+
+
+  # Installing helm
+  # Run these commands from the machine where you manage your EKS cluster:
+  kubectl get nodes
+kubectl get pods -n my-app
+helm version
+
+# If helm is not installed Install it 
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm version
+
+kubectl get storageclass
+
+kubectl create namespace monitoring
+kubectl get namespaces
+
+# Install Prometheus and Grafana
+# First, add the Prometheus community Helm repository:
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+helm repo update
+# Now install the complete monitoring stack:
+helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set grafana.service.type=ClusterIP \
+  --set prometheus.prometheusSpec.retention=7d
+
+This installation includes:
+Component	Purpose
+Prometheus	Collects and stores metrics
+Grafana	Displays monitoring dashboards
+Alertmanager	Handles alerts
+Node Exporter	Collects Linux node metrics
+kube-state-metrics	Monitors Kubernetes resource states
+Prometheus Operator	Manages Prometheus configurations
+
+
+kubectl get pods -n monitoring
+kubectl get svc -n monitoring
+
+You should find services similar to:
+- monitoring-grafana
+- monitoring-kube-prometheus-prometheus
+- monitoring-kube-prometheus-alertmanager
+
+
+Access Grafana
+=================
+kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring
+
+Grafana: http://localhost:3000
+
+Username: admin
+Password: prom-operator
+
+Access Prometheus
+=================
+kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090 -n monitoring
+
+Prometheus: http://localhost:9090
+
+
+========= Phase 3 is completed
+
+Phase 4 – Cluster and infrastructure monitoring
+
+Configure and understand:
+- Node CPU utilization.
+- Node memory utilization.
+- Node disk utilization.
+- Pod CPU consumption.
+- Pod memory consumption.
+- Pod restart count.
+- Pod status.
+- Deployment availability.
+- Kubernetes resource utilization.
+
+
+
+Phase 5 – Application and API monitoring
+- Backend application metrics.
+- HTTP request count.
+- API response time.
+- HTTP 4xx and 5xx errors.
+- Request throughput.
+- Database metrics if we add a database later.
+- Service and Ingress metrics.
+
+Phase 6 – Grafana dashboards and alerts
+
+Create dashboards for:
+- EKS cluster overview.
+- Node monitoring.
+- Pod monitoring.
+- Application monitoring.
+- API performance.
+Configure alerts for high CPU, high memory, pod restarts and API failures.
+
+
+
+Phase 7 – Monitoring experiments
+
+Intentionally create problems:
+- Increase CPU usage.
+- Consume excessive memory.
+- Kill a pod.
+- Stop a deployment.
+- Generate 500 API errors.
+- Generate high API traffic.
+Observe how Prometheus detects the problems and how Grafana displays them.
+
+. Important: What Prometheus components actually monitor
+I want you to understand these components rather than simply installing Helm charts.
+Component	What it monitors
+Prometheus Server	Scrapes and stores metrics
+Node Exporter	Linux EC2 worker-node metrics
+kube-state-metrics	Kubernetes object states
+Kubelet / cAdvisor	Container resource usage
+Prometheus Operator	Manages Prometheus configuration
+Alertmanager	Routes and manages alerts
+Grafana	Dashboards and visualization
